@@ -298,6 +298,9 @@ void VideoView::distanceEndCreation(const QPointF &p)
 
 void VideoView::calculateLTrajectoryFromPoint(const QPointF &p)
 {
+    disconnect(_view, SIGNAL(mouseReleased(QPointF)),
+               this, SLOT(calculateLTrajectoryFromPoint(QPointF)));
+
     int frame = model()->index(_currentVideoRow, VideoModel::CurrentFrameColumn)
             .data(VideoModel::VideoSceneRole).toInt();
 
