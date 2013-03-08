@@ -80,11 +80,7 @@ VideoView::~VideoView()
 
 void VideoView::showMessage(const QString &message, int duration)
 {
-    _status->show();
-    _status->setMessage(message);
-    if (duration) {
-        QTimer::singleShot(duration, _status, SLOT(hide()));
-    }
+    new Status::Message(_status, message, duration);
 }
 
 QRect VideoView::visualRect(const QModelIndex &index) const
@@ -249,15 +245,19 @@ void VideoView::changeFrame(int frame)
 
 void VideoView::beginDistanceCreation()
 {
+    Status::Persistent *status =
+            new Status::Persistent(_status, tr("Click and drag to measure a distance"));
+
     connect(_view, SIGNAL(mousePressed(QPointF)), SLOT(distanceFirstPoint(QPointF)));
-    _status->setMessage(tr("Click and drag to measure a distance"));
+    connect(_view, SIGNAL(mousePressed(QPointF)), status, SLOT(deleteLater()));
 }
 
 void VideoView::beginLTrajectoryCalculation()
 {
-    _status->setMessage(tr("Click a point to track"));
+    Status::Persistent *status = new Status::Persistent(_status, tr("Click a point to track"));
 
     connect(_view, SIGNAL(mouseReleased(QPointF)), SLOT(calculateLTrajectoryFromPoint(QPointF)));
+    connect(_view, SIGNAL(mouseReleased(QPointF)), status, SLOT(deleteLater()));
 }
 
 void VideoView::distanceFirstPoint(const QPointF &p)
@@ -271,15 +271,17 @@ void VideoView::distanceFirstPoint(const QPointF &p)
     guideLine->setPen(QColor(0, 0, 255));
     _videos[_currentVideoRow].distances << guideLine;
 
+    Status::Persistent *status = new Status::Persistent(_status, tr("Release to finish"));
+
     connect(_view, SIGNAL(mouseDragged(QPointF)), SLOT(distanceUpdateSecondPoint(QPointF)));
     connect(_view, SIGNAL(mouseReleased(QPointF)), SLOT(distanceEndCreation(QPointF)));
+    connect(_view, SIGNAL(mouseReleased(QPointF)), status, SLOT(deleteLater()));
 }
 
 void VideoView::distanceUpdateSecondPoint(const QPointF &p)
 {
     QGraphicsLineItem *guideLine = _videos[_currentVideoRow].distances.last();
     guideLine->setLine(QLineF(guideLine->line().p1(), p));
-    _status->setMessage(QString("(%1, %2)").arg(p.x()).arg(p.y()));
 }
 
 void VideoView::distanceEndCreation(const QPointF &p)
@@ -289,8 +291,7 @@ void VideoView::distanceEndCreation(const QPointF &p)
     static_cast<VideoModel *>(model())->createDistance(guideLine->line(), _currentVideoRow);
     delete guideLine;
 
-    _status->setMessage(tr("Done"));
-    QTimer::singleShot(3000, _status, SLOT(hide()));
+    new Status::Message(_status, tr("Done"), 3000);
 
     disconnect(_view, SIGNAL(mouseDragged(QPointF)), this, SLOT(distanceUpdateSecondPoint(QPointF)));
     disconnect(_view, SIGNAL(mouseReleased(QPointF)), this, SLOT(distanceEndCreation(QPointF)));
@@ -306,7 +307,8 @@ void VideoView::calculateLTrajectoryFromPoint(const QPointF &p)
 
     LinearTrajectoryCalcJob *job = static_cast<VideoModel *>(model())->calculateLinearTrajectory
             (p, frame, _currentVideoRow);
-    _status->setJob(tr("Calculating trajectory..."), job);
+    new Status::Job(_status, tr("Calculating trajectory..."), job);
+
     connect(job, SIGNAL(finished()), job, SLOT(deleteLater()));
     job->start();
 }
