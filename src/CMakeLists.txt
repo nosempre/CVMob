@@ -2,7 +2,7 @@ project(CVMob)
 
 cmake_minimum_required(VERSION 2.6)
 
-find_package(Qt4 4.8 REQUIRED)
+find_package(Qt4 4.6 REQUIRED)
 include(${QT_USE_FILE})
 
 find_package(OpenCV 2 REQUIRED)
