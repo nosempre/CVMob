@@ -16,9 +16,9 @@ set(CVMob_sources
     model/videomodel.cpp
     model/baseproxymodel.cpp
     model/distancesproxymodel.cpp
-    model/lineartrajectoriesproxymodel.cpp
+    model/trajectoriesproxymodel.cpp
     model/basejob.cpp
-    model/lineartrajectorycalcjob.cpp
+    model/trajectorycalcjob.cpp
     view/playbar.cpp
     view/videostatus.cpp
 )
@@ -31,9 +31,9 @@ set(CVMob_headers
     model/videomodel.hpp
     model/baseproxymodel.hpp
     model/distancesproxymodel.hpp
-    model/lineartrajectoriesproxymodel.hpp
+    model/trajectoriesproxymodel.hpp
     model/basejob.hpp
-    model/lineartrajectorycalcjob.hpp
+    model/trajectorycalcjob.hpp
     view/playbar.hpp
     view/videostatus.hpp
 )

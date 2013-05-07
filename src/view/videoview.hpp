@@ -83,13 +83,13 @@ protected slots:
 private slots:
     void changeFrame(int frame);
     void beginDistanceCreation();
-    void beginLTrajectoryCalculation();
+    void beginTrajectoryCalculation();
 
     void distanceFirstPoint(const QPointF &p);
     void distanceUpdateSecondPoint(const QPointF &p);
     void distanceEndCreation(const QPointF &p);
 
-    void calculateLTrajectoryFromPoint(const QPointF &p);
+    void calculateTrajectoryFromPoint(const QPointF &p);
 };
 
 #endif // VIDEOVIEW_H

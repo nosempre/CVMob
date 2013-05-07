@@ -70,7 +70,7 @@ VideoView::VideoView(QWidget *parent) :
 
     connect(_playBar, SIGNAL(frameChanged(int)), SLOT(changeFrame(int)));
     connect(_playBar, SIGNAL(newDistanceRequested()), SLOT(beginDistanceCreation()));
-    connect(_playBar, SIGNAL(newTrajectoryRequested()), SLOT(beginLTrajectoryCalculation()));
+    connect(_playBar, SIGNAL(newTrajectoryRequested()), SLOT(beginTrajectoryCalculation()));
 }
 
 VideoView::~VideoView()
@@ -252,7 +252,7 @@ void VideoView::beginDistanceCreation()
     connect(_view, SIGNAL(mousePressed(QPointF)), status, SLOT(deleteLater()));
 }
 
-void VideoView::beginLTrajectoryCalculation()
+void VideoView::beginTrajectoryCalculation()
 {
     Status::Persistent *status = new Status::Persistent(_status, tr("Click a point to track"));
 
@@ -297,15 +297,15 @@ void VideoView::distanceEndCreation(const QPointF &p)
     disconnect(_view, SIGNAL(mouseReleased(QPointF)), this, SLOT(distanceEndCreation(QPointF)));
 }
 
-void VideoView::calculateLTrajectoryFromPoint(const QPointF &p)
+void VideoView::calculateTrajectoryFromPoint(const QPointF &p)
 {
     disconnect(_view, SIGNAL(mouseReleased(QPointF)),
-               this, SLOT(calculateLTrajectoryFromPoint(QPointF)));
+               this, SLOT(calculateTrajectoryFromPoint(QPointF)));
 
     int frame = model()->index(_currentVideoRow, VideoModel::CurrentFrameColumn)
             .data(VideoModel::VideoSceneRole).toInt();
 
-    LinearTrajectoryCalcJob *job = static_cast<VideoModel *>(model())->calculateLinearTrajectory
+    TrajectoryCalcJob *job = static_cast<VideoModel *>(model())->calculateTrajectory
             (p, frame, _currentVideoRow);
     new Status::Job(_status, tr("Calculating trajectory..."), job);
 
